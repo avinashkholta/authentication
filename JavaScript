@@ -1,0 +1,30 @@
+// app.js (Main application file)
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const authenticateToken = require('./middleware/authenticateToken');
+const cors = require('cors');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors()); // Enable CORS for all routes
+app.use(bodyParser.json());
+
+// MongoDB Connection
+mongoose.connect('mongodb://127.0.0.1:27017/user-management', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB Connected'))
+.catch(err => console.error('MongoDB Connection Error:', err));
+
+// Routes
+app.use('/auth', authRoutes);
+app.use('/users', authenticateToken, userRoutes); // Apply authentication middleware
+
+app.listen(PORT, () => {
+  console.log(Server is running on port ${PORT});
+});
